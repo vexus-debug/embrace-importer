@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { HelpButton } from "./HelpButton";
 
 export function AdminHeader() {
   const navigate = useNavigate();
