@@ -166,7 +166,7 @@ export default function DoctorDiagnosisPage() {
 
   const handleSubmit = async () => {
     if (!form.patient_id) { toast({ title: "Select a patient first", variant: "destructive" }); return; }
-    if (!form.primary_diagnosis) { toast({ title: "Primary diagnosis is required", variant: "destructive" }); return; }
+    if (!form.primary_diagnosis) { toast({ title: "Impression is required", variant: "destructive" }); return; }
 
     const { error } = await supabase.from("diagnoses").insert({
       patient_id: form.patient_id,
@@ -498,8 +498,8 @@ export default function DoctorDiagnosisPage() {
       {/* 9. Diagnosis */}
       <CollapsibleSection title="Diagnosis" number="9">
         <div className="space-y-4">
-          <div className="space-y-2"><Label className="font-semibold">Primary Diagnosis</Label><Input placeholder="Main diagnosis..." value={form.primary_diagnosis} onChange={e => set("primary_diagnosis", e.target.value)} /></div>
-          <div className="space-y-2"><Label>Secondary Diagnosis</Label><Input placeholder="Secondary / differential diagnosis..." value={form.secondary_diagnosis} onChange={e => set("secondary_diagnosis", e.target.value)} /></div>
+          <div className="space-y-2"><Label className="font-semibold">Impression</Label><Input placeholder="Clinical impression..." value={form.primary_diagnosis} onChange={e => set("primary_diagnosis", e.target.value)} /></div>
+          <div className="space-y-2"><Label>Definite Diagnosis</Label><Input placeholder="Definite diagnosis..." value={form.secondary_diagnosis} onChange={e => set("secondary_diagnosis", e.target.value)} /></div>
           <div className="space-y-2"><Label>Notes</Label><Textarea placeholder="Clinical reasoning and conclusions..." value={form.diagnosis_notes} onChange={e => set("diagnosis_notes", e.target.value)} /></div>
         </div>
       </CollapsibleSection>
