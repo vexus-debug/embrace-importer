@@ -1,10 +1,12 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Printer, Mail, MessageCircle, Phone, MapPin, Globe } from "lucide-react";
+import { Printer, Mail, MessageCircle, Phone, MapPin, Globe, Download, Loader2 } from "lucide-react";
 import logo from "@/assets/logo.jpg";
+import { downloadInvoicePdf, uploadInvoicePdf, type InvoicePdfData } from "@/admin/lib/invoicePdf";
+import { useToast } from "@/hooks/use-toast";
 
 interface InvoiceItem {
   date: string;
