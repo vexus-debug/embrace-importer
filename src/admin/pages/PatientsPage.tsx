@@ -200,6 +200,11 @@ export default function PatientsPage() {
                 <div><span className="text-muted-foreground">Referral Source:</span> {viewingPatient.referral_source || "N/A"}</div>
                 <div><span className="text-muted-foreground">Last Visit:</span> {viewingPatient.last_visit || "N/A"}</div>
               </div>
+              {/* Diagnosis & Treatment */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-semibold mb-3">Diagnosis & Treatment</h3>
+                <PatientDiagnosisSummary patientId={viewingPatient.id} />
+              </div>
               {/* Dental Chart */}
               <div className="border-t pt-4">
                 <h3 className="text-sm font-semibold mb-3">Dental Chart</h3>
