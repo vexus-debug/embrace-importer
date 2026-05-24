@@ -166,7 +166,7 @@ export default function DoctorDiagnosisPage() {
 
   const handleSubmit = async () => {
     if (!form.patient_id) { toast({ title: "Select a patient first", variant: "destructive" }); return; }
-    if (!form.primary_diagnosis) { toast({ title: "Primary diagnosis is required", variant: "destructive" }); return; }
+    if (!form.primary_diagnosis) { toast({ title: "Impression is required", variant: "destructive" }); return; }
 
     const { error } = await supabase.from("diagnoses").insert({
       patient_id: form.patient_id,
