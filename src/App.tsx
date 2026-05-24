@@ -34,6 +34,7 @@ import AdminLayout from "./admin/components/AdminLayout";
 import AdminDashboard from "./admin/pages/AdminDashboard";
 import PatientsPage from "./admin/pages/PatientsPage";
 import AddPatientPage from "./admin/pages/AddPatientPage";
+import PatientDetailPage from "./admin/pages/PatientDetailPage";
 import DoctorDiagnosisPage from "./admin/pages/DoctorDiagnosisPage";
 import AppointmentsPage from "./admin/pages/AppointmentsPage";
 import DentalChartsPage from "./admin/pages/DentalChartsPage";
