@@ -122,33 +122,57 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange }: Pro
     }, 500);
   };
 
-  const invoiceText = `Invoice: ${invoice.invoice_number}
+  const buildPdfData = (): InvoicePdfData => ({
+    invoice_number: invoice.invoice_number,
+    created_at: invoice.created_at,
+    status: invoice.status,
+    total: totalVal,
+    discount: discountVal,
+    paid: invoice.paid,
+    items,
+    patient: invoice.patient,
+  });
+
+  const summaryText = (link?: string) => `Invoice ${invoice.invoice_number} from ${COMPANY.name}
 Patient: ${invoice.patient?.name}
 Date: ${invoice.created_at.split("T")[0]}
+Total: NGN ${totalVal.toLocaleString()}
+Paid: NGN ${invoice.paid.toLocaleString()}
+${balance > 0 ? `Balance Due: NGN ${balance.toLocaleString()}` : "Fully Paid"}
+${link ? `\nDownload your invoice PDF:\n${link}` : ""}
 
-Items:
-${items.map((it, i) => `${i + 1}. ${it.treatment} — ₦${(it.price || 0).toLocaleString()}`).join("\n")}
-
-Subtotal: ₦${subtotal.toLocaleString()}
-${discountVal > 0 ? `Discount: -₦${discountVal.toLocaleString()}\n` : ""}Total: ₦${totalVal.toLocaleString()}
-Paid: ₦${invoice.paid.toLocaleString()}
-${balance > 0 ? `Balance Due: ₦${balance.toLocaleString()}` : "Fully Paid"}
-
-${COMPANY.name}
-${COMPANY.address}
 ${COMPANY.phone} | ${COMPANY.email}`;
 
-  const handleWhatsApp = () => {
-    const phone = invoice.patient?.phone?.replace(/\D/g, "") || "";
-    const msg = encodeURIComponent(invoiceText);
-    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
+  const handleDownload = () => {
+    setSharing("download");
+    try { downloadInvoicePdf(buildPdfData()); }
+    finally { setSharing(""); }
   };
 
-  const handleEmail = () => {
-    const email = invoice.patient?.email || "";
-    const subject = encodeURIComponent(`Invoice ${invoice.invoice_number} — ${COMPANY.name}`);
-    const body = encodeURIComponent(invoiceText);
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+  const handleWhatsApp = async () => {
+    setSharing("whatsapp");
+    try {
+      const { url } = await uploadInvoicePdf(buildPdfData());
+      const phone = invoice.patient?.phone?.replace(/\D/g, "") || "";
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(summaryText(url))}`, "_blank");
+      toast({ title: "Invoice PDF ready", description: "Link included in WhatsApp message" });
+    } catch (e: any) {
+      toast({ title: "Failed to share", description: e.message, variant: "destructive" });
+    } finally { setSharing(""); }
+  };
+
+  const handleEmail = async () => {
+    setSharing("email");
+    try {
+      const { url } = await uploadInvoicePdf(buildPdfData());
+      const email = invoice.patient?.email || "";
+      const subject = encodeURIComponent(`Invoice ${invoice.invoice_number} — ${COMPANY.name}`);
+      const body = encodeURIComponent(summaryText(url));
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+      toast({ title: "Invoice PDF ready", description: "Link included in email" });
+    } catch (e: any) {
+      toast({ title: "Failed to share", description: e.message, variant: "destructive" });
+    } finally { setSharing(""); }
   };
 
   return (
