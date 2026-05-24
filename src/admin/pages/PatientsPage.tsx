@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { usePatients, useDeletePatient, useUpdatePatient } from "@/hooks/usePatients";
 import PatientDentalChart from "@/admin/components/PatientDentalChart";
+import PatientDiagnosisSummary from "@/admin/components/PatientDiagnosisSummary";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
