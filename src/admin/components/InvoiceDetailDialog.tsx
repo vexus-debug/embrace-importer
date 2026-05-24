@@ -50,6 +50,8 @@ const COMPANY = {
 
 export default function InvoiceDetailDialog({ invoice, open, onOpenChange }: Props) {
   const printRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  const [sharing, setSharing] = useState<"" | "whatsapp" | "email" | "download">("");
 
   if (!invoice) return null;
 
