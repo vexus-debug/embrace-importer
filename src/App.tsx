@@ -103,6 +103,7 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="patients" element={<PatientsPage />} />
             <Route path="patients/add" element={<AddPatientPage />} />
+            <Route path="patients/:id" element={<PatientDetailPage />} />
             <Route path="diagnosis" element={<DoctorDiagnosisPage />} />
             <Route path="appointments" element={<AppointmentsPage />} />
             <Route path="dental-charts" element={<DentalChartsPage />} />
