@@ -34,6 +34,7 @@ import AdminLayout from "./admin/components/AdminLayout";
 import AdminDashboard from "./admin/pages/AdminDashboard";
 import PatientsPage from "./admin/pages/PatientsPage";
 import AddPatientPage from "./admin/pages/AddPatientPage";
+import PatientDetailPage from "./admin/pages/PatientDetailPage";
 import DoctorDiagnosisPage from "./admin/pages/DoctorDiagnosisPage";
 import AppointmentsPage from "./admin/pages/AppointmentsPage";
 import DentalChartsPage from "./admin/pages/DentalChartsPage";
@@ -102,6 +103,7 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="patients" element={<PatientsPage />} />
             <Route path="patients/add" element={<AddPatientPage />} />
+            <Route path="patients/:id" element={<PatientDetailPage />} />
             <Route path="diagnosis" element={<DoctorDiagnosisPage />} />
             <Route path="appointments" element={<AppointmentsPage />} />
             <Route path="dental-charts" element={<DentalChartsPage />} />

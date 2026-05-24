@@ -1,10 +1,12 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Printer, Mail, MessageCircle, Phone, MapPin, Globe } from "lucide-react";
+import { Printer, Mail, MessageCircle, Phone, MapPin, Globe, Download, Loader2 } from "lucide-react";
 import logo from "@/assets/logo.jpg";
+import { downloadInvoicePdf, uploadInvoicePdf, type InvoicePdfData } from "@/admin/lib/invoicePdf";
+import { useToast } from "@/hooks/use-toast";
 
 interface InvoiceItem {
   date: string;
@@ -48,6 +50,8 @@ const COMPANY = {
 
 export default function InvoiceDetailDialog({ invoice, open, onOpenChange }: Props) {
   const printRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  const [sharing, setSharing] = useState<"" | "whatsapp" | "email" | "download">("");
 
   if (!invoice) return null;
 
@@ -118,33 +122,57 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange }: Pro
     }, 500);
   };
 
-  const invoiceText = `Invoice: ${invoice.invoice_number}
+  const buildPdfData = (): InvoicePdfData => ({
+    invoice_number: invoice.invoice_number,
+    created_at: invoice.created_at,
+    status: invoice.status,
+    total: totalVal,
+    discount: discountVal,
+    paid: invoice.paid,
+    items,
+    patient: invoice.patient,
+  });
+
+  const summaryText = (link?: string) => `Invoice ${invoice.invoice_number} from ${COMPANY.name}
 Patient: ${invoice.patient?.name}
 Date: ${invoice.created_at.split("T")[0]}
+Total: NGN ${totalVal.toLocaleString()}
+Paid: NGN ${invoice.paid.toLocaleString()}
+${balance > 0 ? `Balance Due: NGN ${balance.toLocaleString()}` : "Fully Paid"}
+${link ? `\nDownload your invoice PDF:\n${link}` : ""}
 
-Items:
-${items.map((it, i) => `${i + 1}. ${it.treatment} — ₦${(it.price || 0).toLocaleString()}`).join("\n")}
-
-Subtotal: ₦${subtotal.toLocaleString()}
-${discountVal > 0 ? `Discount: -₦${discountVal.toLocaleString()}\n` : ""}Total: ₦${totalVal.toLocaleString()}
-Paid: ₦${invoice.paid.toLocaleString()}
-${balance > 0 ? `Balance Due: ₦${balance.toLocaleString()}` : "Fully Paid"}
-
-${COMPANY.name}
-${COMPANY.address}
 ${COMPANY.phone} | ${COMPANY.email}`;
 
-  const handleWhatsApp = () => {
-    const phone = invoice.patient?.phone?.replace(/\D/g, "") || "";
-    const msg = encodeURIComponent(invoiceText);
-    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
+  const handleDownload = () => {
+    setSharing("download");
+    try { downloadInvoicePdf(buildPdfData()); }
+    finally { setSharing(""); }
   };
 
-  const handleEmail = () => {
-    const email = invoice.patient?.email || "";
-    const subject = encodeURIComponent(`Invoice ${invoice.invoice_number} — ${COMPANY.name}`);
-    const body = encodeURIComponent(invoiceText);
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+  const handleWhatsApp = async () => {
+    setSharing("whatsapp");
+    try {
+      const { url } = await uploadInvoicePdf(buildPdfData());
+      const phone = invoice.patient?.phone?.replace(/\D/g, "") || "";
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(summaryText(url))}`, "_blank");
+      toast({ title: "Invoice PDF ready", description: "Link included in WhatsApp message" });
+    } catch (e: any) {
+      toast({ title: "Failed to share", description: e.message, variant: "destructive" });
+    } finally { setSharing(""); }
+  };
+
+  const handleEmail = async () => {
+    setSharing("email");
+    try {
+      const { url } = await uploadInvoicePdf(buildPdfData());
+      const email = invoice.patient?.email || "";
+      const subject = encodeURIComponent(`Invoice ${invoice.invoice_number} — ${COMPANY.name}`);
+      const body = encodeURIComponent(summaryText(url));
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+      toast({ title: "Invoice PDF ready", description: "Link included in email" });
+    } catch (e: any) {
+      toast({ title: "Failed to share", description: e.message, variant: "destructive" });
+    } finally { setSharing(""); }
   };
 
   return (
@@ -157,11 +185,14 @@ ${COMPANY.phone} | ${COMPANY.email}`;
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint} title="Print">
                 <Printer className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600" onClick={handleWhatsApp} title="Share via WhatsApp">
-                <MessageCircle className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownload} title="Download PDF" disabled={sharing === "download"}>
+                {sharing === "download" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600" onClick={handleEmail} title="Share via Email">
-                <Mail className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600" onClick={handleWhatsApp} title="Share PDF via WhatsApp" disabled={sharing === "whatsapp"}>
+                {sharing === "whatsapp" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600" onClick={handleEmail} title="Share PDF via Email" disabled={sharing === "email"}>
+                {sharing === "email" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
               </Button>
             </div>
           </DialogTitle>

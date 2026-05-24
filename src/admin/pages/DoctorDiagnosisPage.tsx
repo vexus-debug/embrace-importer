@@ -471,7 +471,7 @@ export default function DoctorDiagnosisPage() {
             <div className="space-y-3">
               {uploadedFiles.map((file, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20">
-                  {file.preview && file.preview.startsWith("data:image") ? (
+                  {file.preview ? (
                     <img src={file.preview} alt={file.name} className="h-16 w-16 object-cover rounded border" />
                   ) : (
                     <div className="h-16 w-16 flex items-center justify-center bg-muted rounded border"><FileImage className="h-6 w-6 text-muted-foreground" /></div>
