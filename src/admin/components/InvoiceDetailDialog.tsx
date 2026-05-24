@@ -185,11 +185,14 @@ ${COMPANY.phone} | ${COMPANY.email}`;
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint} title="Print">
                 <Printer className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600" onClick={handleWhatsApp} title="Share via WhatsApp">
-                <MessageCircle className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownload} title="Download PDF" disabled={sharing === "download"}>
+                {sharing === "download" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600" onClick={handleEmail} title="Share via Email">
-                <Mail className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600" onClick={handleWhatsApp} title="Share PDF via WhatsApp" disabled={sharing === "whatsapp"}>
+                {sharing === "whatsapp" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600" onClick={handleEmail} title="Share PDF via Email" disabled={sharing === "email"}>
+                {sharing === "email" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
               </Button>
             </div>
           </DialogTitle>
